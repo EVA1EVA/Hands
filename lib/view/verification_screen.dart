@@ -16,7 +16,7 @@ class VerificationScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          // 1. التموج العلوي الموحد للهوية
+          // التموج العلوي (Wave)
           Positioned(
             top: 0, left: 0, right: 0,
             child: ClipPath(
@@ -43,49 +43,57 @@ class VerificationScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 40),
                   const Text(
-                    "Verification Code",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                    "رمز التحقق",
+                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                   ),
                   const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      "Please enter the 4-digit code sent to your email address",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  const Text(
+                    "يرجى إدخال رمز التحقق المكون من 6 أرقام\nالمرسل إلى بريدك الإلكتروني",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.5),
+                  ),
+                  const SizedBox(height: 40),
+
+                  // حقول إدخال الرمز (6 خانات) مع الهالة
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(
+                          6,
+                              (index) => _buildGlowOTPBox(context, index, authController)
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 40),
 
-                  // حقول إدخال الرمز (OTP Fields)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(4, (index) => _buildOTPBox(context, index)),
-                  ),
+                  const SizedBox(height: 50),
 
-                  const SizedBox(height: 40),
-
+                  // زر التحقق مع حالة التحميل
                   Obx(() => PrimaryButton(
-                    text: "Verify Now",
+                    text: "تحقق الآن",
                     isLoading: authController.isLoading.value,
                     onPressed: () => authController.verifyOTP(),
                   )),
 
                   const SizedBox(height: 25),
 
-                  // إعادة إرسال الرمز مع استخدام الـ Accent لكسر الكآبة
+                  // زر إعادة الإرسال
                   TextButton(
                     onPressed: () {
-                      // منطق إعادة الإرسال
+                      // استدعاء دالة إعادة الإرسال من الـ controller
                     },
                     child: RichText(
                       text: const TextSpan(
                         style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
                         children: [
-                          TextSpan(text: "Didn't receive a code? "),
+                          TextSpan(text: "لم يصلك الرمز؟ "),
                           TextSpan(
-                            text: "Resend",
-                            style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.bold),
+                            text: "إعادة إرسال",
+                            style: TextStyle(
+                              color: AppColors.accent,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ],
                       ),
@@ -100,35 +108,57 @@ class VerificationScreen extends StatelessWidget {
     );
   }
 
-  // بناء مربعات الرمز الفردية
-  Widget _buildOTPBox(BuildContext context, int index) {
+  // ويدجت مربع الـ OTP مع تأثير الهالة (Glow Effect)
+  Widget _buildGlowOTPBox(BuildContext context, int index, AuthController controller) {
     return Container(
-      width: 60,
-      height: 65,
+      width: 46,
+      height: 58,
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200, width: 2),
+        // إضافة الهالة والظل لتطابق شاشة إعادة التعيين
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 5))
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: AppColors.accent.withOpacity(0.15), // الهالة الملونة
+            blurRadius: 12,
+            spreadRadius: 1,
+          ),
         ],
+        border: Border.all(
+          color: AppColors.accent.withOpacity(0.3),
+          width: 1.2,
+        ),
       ),
       child: TextField(
-        onChanged: (value) {
-          if (value.length == 1 && index < 3) {
-            FocusScope.of(context).nextFocus();
-          }
-          if (value.isEmpty && index > 0) {
-            FocusScope.of(context).previousFocus();
-          }
-        },
         textAlign: TextAlign.center,
         keyboardType: TextInputType.number,
         maxLength: 1,
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.accent),
+        cursorColor: AppColors.accent,
+        style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: AppColors.accent
+        ),
+        onChanged: (value) {
+          // تحديث الرمز في الـ Controller
+          controller.updateOTP(index, value);
+
+          // منطق التنقل التلقائي بين المربعات
+          if (value.isNotEmpty && index < 5) {
+            FocusScope.of(context).nextFocus();
+          } else if (value.isEmpty && index > 0) {
+            FocusScope.of(context).previousFocus();
+          }
+        },
         decoration: const InputDecoration(
           counterText: "",
           border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
         ),
       ),
     );
