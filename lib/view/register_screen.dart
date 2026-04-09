@@ -62,7 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 15),
                     Obx(() => Row(
                       children: [
-                        _buildTypeCard("طالب خدمة", Icons.person_search_outlined, authController.userType.value == 'client', () => authController.setUserType('client')),
+                        _buildTypeCard("طالب خدمة", Icons.person_search_outlined, authController.userType.value == 'user', () => authController.setUserType('user')),
                         const SizedBox(width: 15),
                         _buildTypeCard("مقدم خدمة", Icons.engineering_outlined, authController.userType.value == 'provider', () => authController.setUserType('provider')),
                       ],

@@ -5,7 +5,7 @@ import '../view/splash_screen.dart';
 import '../view/login_screen.dart';
 import '../view/register_screen.dart';
 import '../view/verification_screen.dart';
-
+import '../view/home_screen.dart';
 class AppRoutes {
   static const String splash = '/splash';
   static const String login = '/login';
@@ -13,7 +13,7 @@ class AppRoutes {
   static const String verification = '/verification';
   static const String forgotPassword = '/forgotPassword';
   static const String resetPassword = '/resetPassword';
-
+  static const String home = '/home';
   static final routes = [
 
     GetPage(
@@ -25,5 +25,10 @@ class AppRoutes {
     GetPage(name: verification, page: () => const VerificationScreen()),
     GetPage(name: forgotPassword, page: () => const ForgotPasswordScreen()),
     GetPage(name: resetPassword, page: () => const ResetPasswordScreen()),
+    GetPage(
+      name: home,
+      page: () => const HomeScreen(),
+      transition: Transition.fadeIn, // إضافة تأثير ظهور ناعم للرئيسية
+    ),
   ];
 }

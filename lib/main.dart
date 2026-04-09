@@ -40,7 +40,9 @@ class MyApp extends StatelessWidget {
       ],
 
 
-      initialRoute: AppRoutes.splash,
+     initialRoute: AppRoutes.splash,
+     // initialRoute: AppRoutes.home,
+
       getPages: AppRoutes.routes,
     );
   }

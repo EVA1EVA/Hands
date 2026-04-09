@@ -1,34 +1,26 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import '../core/theme/app_colors.dart';
+import '../api/api_service.dart';
 import '../routes/app_routes.dart';
-
+import 'package:http/http.dart' as http;
 class AuthController extends GetxController {
-  // ---------------------------------------------------------------------------
-  // 1. المتغيرات والـ Controllers (Variables & Text Controllers)
-  // ---------------------------------------------------------------------------
   var isLoading = false.obs;
   var isPasswordVisible = false.obs;
-  var userType = 'client'.obs; // 'client' or 'provider'
+  var userType = 'user'.obs;
   var otpValues = List.filled(6, "").obs;
 
-  // الحقول الأساسية
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  // حقول استعادة كلمة المرور
   final forgotEmailController = TextEditingController();
   final newPasswordController = TextEditingController();
   final confirmNewPasswordController = TextEditingController();
-
-  // حقل الـ OTP (اختياري إذا كنتِ تستخدمين القائمة)
   final otpController = TextEditingController();
 
-  // ---------------------------------------------------------------------------
-  // 2. دوال تسجيل الدخول وإنشاء الحساب (Auth Logic)
-  // ---------------------------------------------------------------------------
 
   /// دالة تسجيل الدخول
   void login() async {
@@ -36,68 +28,102 @@ class AuthController extends GetxController {
 
     isLoading.value = true;
     try {
-      // محاكاة طلب الشبكة (API لاحقاً)
-      await Future.delayed(const Duration(seconds: 2));
-      // Get.offAllNamed(AppRoutes.home);
+      Map<String, dynamic> body = {
+        "email": emailController.text.trim(),
+        "password": passwordController.text,
+      };
+
+      final response = await ApiService.loginUser(body);
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        String token = responseData['token'] ?? "";
+
+        // نصيحة: خزنّي التوكن لاحقاً باستخدام GetStorage
+        Get.snackbar("نجاح", "أهلاً بك مجدداً");
+
+        Get.offAllNamed(AppRoutes.home);
+      } else {
+        Get.snackbar("خطأ", responseData['message'] ?? "بيانات الدخول غير صحيحة");
+      }
     } catch (e) {
-      // التعامل مع الأخطاء
+      print("Login Error: $e");
+      Get.snackbar("خطأ", "تعذر الاتصال بالسيرفر");
     } finally {
       isLoading.value = false;
     }
   }
-
   /// دالة إنشاء حساب جديد
   void register() async {
     if (!_validateRegister()) return;
 
-    Map<String, dynamic> body = {
-      "name": nameController.text,
-      "email": emailController.text,
-      "password": passwordController.text,
-      "password_confirmation": confirmPasswordController.text,
-      "role": userType.value,
-    };
-
     isLoading.value = true;
     try {
-      await Future.delayed(const Duration(seconds: 2));
-      Get.toNamed(AppRoutes.verification);
+      Map<String, dynamic> body = {
+        "name": nameController.text.trim(),
+        "email": emailController.text.trim(),
+        "password": passwordController.text,
+        "password_confirmation": confirmPasswordController.text,
+        "role": userType.value,
+      };
+
+      final response = await ApiService.registerUser(body);
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        Get.snackbar("نجاح", responseData['message'] ?? "تم إنشاء الحساب");
+        Get.toNamed(AppRoutes.verification);
+      } else {
+        Get.snackbar("خطأ", responseData['message'] ?? "فشل التسجيل");
+      }
     } catch (e) {
-      // التعامل مع الأخطاء
+      Get.snackbar("خطأ", e.toString());
     } finally {
       isLoading.value = false;
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // 3. دوال التحقق من البريد (Email Verification - OTP)
-  // ---------------------------------------------------------------------------
-
-  /// تحديث رقم معين في قائمة الـ OTP
   void updateOTP(int index, String value) {
     otpValues[index] = value;
   }
 
   /// إرسال الرمز للتحقق من الإيميل
+
   void verifyOTP() async {
-    String fullOTP = otpValues.join();
+    String fullOTP = otpValues.join(); // تجميع الرمز 819003
     if (fullOTP.length < 6) {
-      Get.snackbar("خطأ", "أكمل الرمز أولاً");
+      Get.snackbar("تنبيه", "يرجى إدخال الرمز كاملاً");
       return;
     }
 
     isLoading.value = true;
     try {
-      print("جاري التحقق من الرمز: $fullOTP");
-      // الربط مع API: (email, code)
+      Map<String, dynamic> body = {
+        "email": emailController.text.trim(),
+        "code": fullOTP,
+      };
+
+      final response = await ApiService.verifyEmail(body);
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Get.snackbar("نجاح", responseData['message'] ?? "تم تفعيل حسابك بنجاح");
+
+        Get.offAllNamed(AppRoutes.login);
+      } else {
+        Get.snackbar("فشل التحقق", responseData['message'] ?? "الرمز غير صحيح");
+      }
+    } catch (e) {
+      print("Verification Error: $e");
+      Get.snackbar("خطأ", "تعذر الاتصال بالسيرفر");
     } finally {
       isLoading.value = false;
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // 4. دوال استعادة كلمة المرور (Forgot & Reset Password)
-  // ---------------------------------------------------------------------------
+
+
+  //  دوال استعادة كلمة المرور
 
   /// طلب إرسال رمز استعادة كلمة المرور (إلى الإيميل)
   void sendPasswordResetCode() async {
@@ -133,9 +159,7 @@ class AuthController extends GetxController {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // 5. دوال مساعدة (Helper & UI Functions)
-  // ---------------------------------------------------------------------------
+  //5. دوال مساعدة
 
   /// تغيير نوع الحساب
   void setUserType(String type) => userType.value = type;
@@ -144,10 +168,6 @@ class AuthController extends GetxController {
   void togglePasswordVisibility() {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
-
-  // ---------------------------------------------------------------------------
-  // 6. التحقق من صحة البيانات (Validation Logic)
-  // ---------------------------------------------------------------------------
 
   bool _validateLogin() {
     if (!GetUtils.isEmail(emailController.text.trim())) {
@@ -172,22 +192,4 @@ class AuthController extends GetxController {
     }
     return _validateLogin();
   }
-
-  // ---------------------------------------------------------------------------
-  // 7. دورة الحياة (Lifecycle)
-  // ---------------------------------------------------------------------------
-/*
-  @override
-  void onClose() {
-    // إغلاق جميع الـ Controllers لتوفير الذاكرة
-    emailController.dispose();
-    passwordController.dispose();
-    nameController.dispose();
-    confirmPasswordController.dispose();
-    forgotEmailController.dispose();
-    newPasswordController.dispose();
-    confirmNewPasswordController.dispose();
-    otpController.dispose();
-    super.onClose();
-  }*/
 }
