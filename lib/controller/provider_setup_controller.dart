@@ -162,6 +162,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:untitled1/controller/sub_category_controller.dart';
 import '../core/api_constants.dart';
+import '../view/provider_requests_screen.dart';
 
 class ProviderSetupController extends GetxController {
   var selectedCategoryIds = <int>[].obs;
@@ -285,8 +286,7 @@ class ProviderSetupController extends GetxController {
       var responseData = json.decode(response.body);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Get.offAllNamed('/ProviderRequests'); // نوجهه للرئيسية بعد النجاح
-        Get.snackbar(
+        Get.offAll(() => const ProviderRequestsScreen());        Get.snackbar(
           "تم الإرسال بنجاح",
           "وثائقك الآن قيد المراجعة من قبل الإدارة. يمكنك تصفح الطلبات بانتظار التفعيل.",
           backgroundColor: Colors.green.withOpacity(0.8),
@@ -296,8 +296,7 @@ class ProviderSetupController extends GetxController {
         String errorMsg = responseData['message']?.toString().toLowerCase() ?? "";
 
         if (errorMsg.contains("pending") || errorMsg.contains("already")) {
-          Get.offAllNamed('/ProviderRequests');
-          Get.snackbar("حالة الطلب", "لديك طلب توثيق قيد المراجعة بالفعل.", backgroundColor: Colors.blueAccent, colorText: Colors.white);
+          Get.offAll(() => const ProviderRequestsScreen());          Get.snackbar("حالة الطلب", "لديك طلب توثيق قيد المراجعة بالفعل.", backgroundColor: Colors.blueAccent, colorText: Colors.white);
         } else {
           throw responseData['message'] ?? "حدث خطأ غير متوقع في الرفع";
         }
