@@ -1,19 +1,4 @@
-/*import 'package:flutter/material.dart';
-
-class AppColors {
-  static const primary = Color(0xFF10307A);
-  static const teal = Color(0xFF14B8A6);
-  static const accent = Color(0xFFF59E0B);
-  static const primaryLight = Color(0xFF273956);
-  static const background = Color(0xFFF8FAFC);
-  static const card = Color(0xFFFFFFFF);
-
-  static const textPrimary = Color(0xFF0F172A);
-  static const textSecondary = Color(0xFF64748B);
-
-  static const error = Color(0xFFEF4444);
-  static const success = Color(0xFF22C55E);
-}*/
+/*
 import 'package:flutter/material.dart';
 
 class AppColors {
@@ -30,5 +15,25 @@ class AppColors {
   static const textPrimary = Color(0xFF0F172A); // أسود كربوني
   static const textSecondary = Color(0xFF64748B); // رمادي للنصوص الفرعية
   static const accent = Color(0xFFF59E0B);  // البرتقالي الذهبي
+  static const error = Color(0xFFEF4444);
+}*/
+import 'package:flutter/material.dart';
+
+class AppColors {
+  // 1. تدرج البنفسجي الأساسي (الأصلي كان أزرق) - مستوحى من عمق ألوان الأزرار في image_2.png و image_3.png
+  static const primaryGradientStart = Color(0xFF2E136C); // بنفسجي غامق جداً (إنديغو)
+  static const primaryGradientEnd = Color(0xFF5A45A0);   // بنفسجي مشرق ومتوسط
+
+  // 2. تدرج البنفسجي الفاتح للأزرار الثانوية (الأصلي كان فيروزي) - مستوحى من الأزرار الفاتحة مثل 'BACK TO LOGIN'
+  static const tealGradientStart = Color(0xFF9180C4); // بنفسجي فاتح متوسط
+  static const tealGradientEnd = Color(0xFFD3C8F0);   // بنفسجي لافندر فاتح جداً
+
+  // 3. ألوان الخلفية والنصوص (الفاتحة والأنيقة)
+  // قد نعدلها لتكون مائلة قليلاً للبنفسجي بدلاً من الأبيض الصرف
+  static const background = Color(0xFFFBF8FF); // أبيض مائل جداً لللافندر
+  static const card = Color(0xFFFFFFFF);    // ناصع البياض للحقول
+  static const textPrimary = Color(0xFF0C081A); // أسود كربوني مائل للبنفسجي الغامق
+  static const textSecondary = Color(0xFF7A708F); // رمادي مائل لللافندر للنصوص الفرعية
+  static const accent = Color(0xFFF59E0B);  // البرتقالي الذهبي (يحافظ على التباين)
   static const error = Color(0xFFEF4444);
 }

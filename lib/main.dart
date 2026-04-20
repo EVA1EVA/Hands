@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'controller/auth_controller.dart';
 import 'core/theme/app_colors.dart';
 import 'routes/app_routes.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
+
+  Get.put(AuthController(), permanent: true);
   runApp(const MyApp());
 }
 
@@ -41,7 +47,8 @@ class MyApp extends StatelessWidget {
 
 
      initialRoute: AppRoutes.splash,
-     // initialRoute: AppRoutes.home,
+      //initialRoute: AppRoutes.providerSetup,
+      //initialRoute: AppRoutes.home,
 
       getPages: AppRoutes.routes,
     );

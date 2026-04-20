@@ -24,13 +24,13 @@ class PrimaryButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           gradient: const LinearGradient(
             colors: [
-              AppColors.tealGradientStart,
+              AppColors.primaryGradientStart,
               AppColors.tealGradientEnd,
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.tealGradientStart.withOpacity(0.3),
+              color: AppColors.primaryGradientStart.withOpacity(0.3),
               blurRadius: 15,
               spreadRadius: 2,
               offset: const Offset(0, 5), // ظل سفلي يعطي ارتفاعاً
