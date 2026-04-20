@@ -35,7 +35,7 @@ class AppRoutes {
     GetPage(
       name: home,
       page: () => const HomeScreen(),
-      binding: HomeBinding(),
+      //binding: HomeBinding(),
       transition: Transition.fadeIn, // إضافة تأثير ظهور ناعم للرئيسية
     ),
     GetPage(name: providerSetup, page: () => const ProviderSetupScreen()),

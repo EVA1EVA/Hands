@@ -5,6 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'controller/auth_controller.dart';
+import 'controller/home_controller.dart';
 import 'core/theme/app_colors.dart';
 import 'routes/app_routes.dart';
 
@@ -13,6 +14,7 @@ Future<void> main() async {
   await GetStorage.init();
 
   Get.put(AuthController(), permanent: true);
+  Get.put(HomeController(), permanent: true);
   runApp(const MyApp());
 }
 

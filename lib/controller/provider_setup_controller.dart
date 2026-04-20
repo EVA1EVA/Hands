@@ -213,6 +213,7 @@ class ProviderSetupController extends GetxController {
       );
 
       if (catResponse.statusCode == 200 || catResponse.statusCode == 201) {
+        print("Cat Response Data: ${catResponse.body}");
         // إذا نجحنا، ننتقل فوراً لخطوة رفع الهوية
         currentStep.value = 1;
       } else {

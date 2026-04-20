@@ -20,27 +20,33 @@ class ProviderRequestsController extends GetxController {
       String? token = box.read('token');
 
       var response = await http.get(
-        Uri.parse('${ApiConstants.baseUrl}/provider/requests'), // تأكدي إن v1 مو مكررة هون
+        Uri.parse('${ApiConstants.baseUrl}/provider/requests'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
         },
       );
 
-      // تحويل البيانات القادمة
-      var decodedData = json.decode(response.body);
+      print("Full Backend Response: ${response.body}"); // للبحث عن الـ data
 
       if (response.statusCode == 200) {
-        // ✅ فحص نوع البيانات قبل الإسناد
-        if (decodedData is List) {
-          availableRequests.assignAll(decodedData);
-        } else {
-          // إذا السيرفر بعت Map (يعني رسالة خطأ مثل select cat first)
-          availableRequests.clear();
-          print("⚠️ السيرفر طلب متطلبات إضافية: ${decodedData['original']}");
+        var decodedData = json.decode(response.body);
 
-          // تنبيه لليوزر (البروفايدر) يروح يكمل ملفه
-          Get.snackbar("تنبيه", "يرجى تحديد تخصصاتك من الملف الشخصي أولاً");
+        // الباك إند يغلف البيانات بـ ApiResponse::success (حقل data)
+        // والباجينيشن يغلفها مرة أخرى بـ (حقل data)
+        if (decodedData['status'] == true) {
+          var paginationData = decodedData['data']; // هذا كائن الباجينيشن
+
+          if (paginationData != null && paginationData['data'] is List) {
+            List<dynamic> requests = paginationData['data'];
+            availableRequests.assignAll(requests);
+          } else {
+            availableRequests.clear();
+            print("⚠️ لا توجد طلبات في المصفوفة");
+          }
+        } else {
+          // إذا كان السيرفر أرسل 'select cat first' أو غيره
+          Get.snackbar("تنبيه", decodedData['message'] ?? "يرجى إكمال البيانات");
         }
       }
     } catch (e) {
@@ -48,8 +54,7 @@ class ProviderRequestsController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
-  // تقديم عرض (v1/offers) - Logic Layer
+  }  // تقديم عرض (v1/offers) - Logic Layer
   Future<void> submitOffer({
     required int requestId,
     required String minPrice,
@@ -75,7 +80,7 @@ class ProviderRequestsController extends GetxController {
       String? token = box.read('token');
 
       var response = await http.post(
-        Uri.parse('${ApiConstants.baseUrl}/v1/offers'),
+        Uri.parse('${ApiConstants.baseUrl}/offers'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
