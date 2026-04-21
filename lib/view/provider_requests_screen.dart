@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/provider_requests_controller.dart';
-import '../controller/home_controller.dart';
 import '../core/theme/app_colors.dart';
 
 class ProviderRequestsScreen extends StatelessWidget {

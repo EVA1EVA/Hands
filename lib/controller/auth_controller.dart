@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:untitled1/controller/provider_setup_controller.dart';
 import 'package:untitled1/controller/sub_category_controller.dart';
+import 'package:untitled1/controller/user_offers_controller.dart';
 import '../api/api_service.dart';
 import '../core/api_constants.dart';
 import '../routes/app_routes.dart';
@@ -294,6 +295,9 @@ class AuthController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
 
+
+        // 2. 🚀 السطر النووي: حذف الكنترولر القديم من الذاكرة تماماً
+        Get.delete<HomeController>(force: true);
         // 🚀 1. استخراج التوكن النهائي وتأمين تخزينه
         String? serverToken = responseData['access_token']?.toString() ??
             responseData['token']?.toString() ??
@@ -574,10 +578,12 @@ class AuthController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         userType.value = currentRole;
-
+        Get.delete<HomeController>(force: true);
+        Get.delete<SubCategoryController>(force: true);
+        Get.delete<UserOffersController>(force: true); // إذا كان موجوداً
         if (currentRole.trim().toLowerCase() == 'provider') {
-          Get.delete<HomeController>(force: true);
-          Get.delete<SubCategoryController>(force: true);
+        //  Get.delete<HomeController>(force: true);
+         // Get.delete<SubCategoryController>(force: true);
 
           await box.write('token', savedToken);
           Get.offAllNamed(AppRoutes.providerSetup);
