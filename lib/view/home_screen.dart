@@ -11,7 +11,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final HomeController controller = Get.find();
+    //final HomeController controller = Get.find();
+    final controller = Get.put(HomeController());
 
     return Scaffold(
       backgroundColor: AppColors.background,

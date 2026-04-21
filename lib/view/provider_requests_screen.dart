@@ -10,11 +10,10 @@ class ProviderRequestsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(ProviderRequestsController());
-    // تأكدي أن HomeController موجود في الـ main بـ permanent: true
-    final homeController = Get.find<HomeController>();
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      extendBody: true,
       body: Column(
         children: [
           // 🚀 الهيدر المطور مع الدوائر والـ Accent
@@ -136,72 +135,106 @@ class ProviderRequestsScreen extends StatelessWidget {
   }
 
   Widget _buildRequestCard(BuildContext context, dynamic request, ProviderRequestsController controller) {
+    final String categoryName = request['category']?['name'] ?? "صيانة عامة";
+    final String date = request['created_at']?.split('T')[0] ?? 'اليوم';
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(20), // زوايا أنعم
+        border: Border.all(color: AppColors.primaryGradientStart.withOpacity(0.08), width: 1),
         boxShadow: [
-          BoxShadow(color: AppColors.primaryGradientStart.withOpacity(0.06), blurRadius: 20, offset: const Offset(0, 10)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: Column(
-          children: [
-            // شريط علوي ملون بسيط
-            Container(height: 5, width: double.infinity, color: AppColors.accent),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Row(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => _showOfferSheet(context, request, controller), // إذا ضغط على البطاقة يفتح له العرض
+          child: Padding(
+            padding: const EdgeInsets.all(16), // Padding مضغوط وناعم
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. حاوية الأيقونة الصافية والصغيرة
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(Icons.handyman_rounded, color: AppColors.accent, size: 24),
+                ),
+                const SizedBox(width: 14),
+
+                // 2. معلومات الطلب
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.12), borderRadius: BorderRadius.circular(20)),
-                        child: const Icon(Icons.flash_on_rounded, color: AppColors.accent, size: 24),
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              request['category']?['name'] ?? "صيانة عامة",
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: AppColors.textPrimary, fontFamily: 'Tajawal'),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "تاريخ النشر: ${request['created_at']?.split('T')[0] ?? 'اليوم'}",
-                              style: TextStyle(color: Colors.grey.shade500, fontSize: 11, fontFamily: 'Tajawal'),
-                            ),
-                          ],
+                      Text(
+                        categoryName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: AppColors.textPrimary,
+                          fontFamily: 'Tajawal',
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey),
+                      const SizedBox(height: 6),
+                      // صف المعلومات الثانوية (التاريخ ومكان وهمي)
+                      Row(
+                        children: [
+                          Icon(Icons.calendar_today_rounded, size: 12, color: Colors.grey.shade500),
+                          const SizedBox(width: 4),
+                          Text(date, style: TextStyle(color: Colors.grey.shade500, fontSize: 11, fontFamily: 'Tajawal')),
+
+                          const SizedBox(width: 12),
+
+                          Icon(Icons.location_on_rounded, size: 12, color: Colors.grey.shade500),
+                          const SizedBox(width: 4),
+                          Text("بالقرب منك", style: TextStyle(color: Colors.grey.shade500, fontSize: 11, fontFamily: 'Tajawal')),
+                        ],
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () => _showOfferSheet(context, request, controller),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryGradientStart,
-                      minimumSize: const Size(double.infinity, 56),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                      elevation: 0,
-                    ),
-                    child: const Text("تقديم عرض سعر", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                ),
+
+                // 3. زر تقديم العرض (مضغوط وعملي جداً)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                      color: AppColors.primaryGradientStart,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(color: AppColors.primaryGradientStart.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3))
+                      ]
                   ),
-                ],
-              ),
+                  child: const Text(
+                    "تقديم عرض",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Tajawal'
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
-
   void _showOfferSheet(BuildContext context, dynamic request, ProviderRequestsController controller) {
     final minPrice = TextEditingController();
     final maxPrice = TextEditingController();
@@ -210,87 +243,162 @@ class ProviderRequestsScreen extends StatelessWidget {
     Get.bottomSheet(
       isScrollControlled: true,
       Container(
+        height: MediaQuery.of(context).size.height * 0.85, // جعلناه يأخذ 85% من الشاشة ليرى كل التفاصيل
         padding: const EdgeInsets.fromLTRB(25, 15, 25, 25),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(child: Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(10)))),
-              const SizedBox(height: 25),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(child: Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(10)))),
+            const SizedBox(height: 25),
 
-              // 📑 قسم تفاصيل الطلب (المعلومات التي طلبها الزبون)
-              const Text("تفاصيل الطلب المختصرة", style: TextStyle(fontSize: 14, color: AppColors.accent, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              _buildRequestDetails(request),
+            // 📑 قسم تفاصيل الطلب (السؤال والجواب)
+            const Text("التفاصيل التقنية للطلب", style: TextStyle(fontSize: 16, color: AppColors.primaryGradientStart, fontWeight: FontWeight.w900, fontFamily: 'Tajawal')),
+            const SizedBox(height: 15),
 
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Divider(thickness: 1, color: AppColors.background),
-              ),
-
-              const Text("عرضك المالي", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(child: _buildPriceInput("من", minPrice)),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildPriceInput("إلى", maxPrice)),
-                ],
-              ),
-              const SizedBox(height: 20),
-              const Text("ملاحظات إضافية للزبون", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-              const SizedBox(height: 10),
-              TextField(
-                controller: msg,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: "مثلاً: يمكنني الحضور اليوم، السعر يشمل قطع الغيار...",
-                  hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
-                  fillColor: AppColors.background,
-                  filled: true,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+            // جعلنا قسم التفاصيل قابلاً للتمرير في حال كانت الأسئلة كثيرة
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildRequestDetails(request),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 25),
+                      child: Divider(thickness: 1.5, color: AppColors.background),
+                    ),
+                    const Text("عرضك المالي", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary, fontFamily: 'Tajawal')),
+                    const SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Expanded(child: _buildPriceInput("من", minPrice)),
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildPriceInput("إلى", maxPrice)),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    const Text("ملاحظات العرض (اختياري)", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary, fontFamily: 'Tajawal')),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: msg,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText: "مثال: السعر يشمل قطع الغيار، ويمكنني التنفيذ غداً صباحاً...",
+                        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13, fontFamily: 'Tajawal'),
+                        fillColor: AppColors.background,
+                        filled: true,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 30),
-              _buildSubmitButton(controller, request['id'], minPrice, maxPrice, msg),
-            ],
-          ),
+            ),
+            const SizedBox(height: 15),
+            _buildSubmitButton(controller, request['id'], minPrice, maxPrice, msg),
+          ],
         ),
       ),
     );
   }
 
-  // 🚀 ويدجت لعرض إجابات العميل في الـ BottomSheet
+  // 🚀 المحلل الذكي للأسئلة والأجوبة (The Smart Q&A Parser)
   Widget _buildRequestDetails(dynamic request) {
-    // نفترض أن الباك إند يرسل الإجابات في حقل 'answers'
-    Map<String, dynamic> answers = request['answers'] ?? {};
+    // التقاط بيانات الـ Answers من الباك إند
+    var answersData = request['answers'];
 
-    if (answers.isEmpty) return const Text("لا توجد تفاصيل إضافية");
+    if (answersData == null) {
+      return const Text("لم يقدم العميل تفاصيل إضافية", style: TextStyle(fontFamily: 'Tajawal', color: AppColors.textSecondary));
+    }
 
+    List<Widget> qnaWidgets = [];
+
+    // 1. إذا كان الباك إند يرسل البيانات كمصفوفة (List of Objects)
+    if (answersData is List && answersData.isNotEmpty) {
+      for (var item in answersData) {
+        // نحاول سحب نص السؤال من الحقل 'question' أو 'title' أو المفتاح مباشرة
+        String question = item['question']?['question'] ?? item['question_text'] ?? "سؤال تفصيلي";
+        String answer = item['answer']?.toString() ?? "بدون إجابة";
+
+        qnaWidgets.add(_buildQnARow(question, answer));
+      }
+    }
+    // 2. إذا كان الباك إند يرسل البيانات ككائن (Map/Object)
+    else if (answersData is Map && answersData.isNotEmpty) {
+      answersData.forEach((key, value) {
+        String question = key.toString(); // المفتاح قد يكون الـ ID أو نص السؤال
+        String answer = value.toString();
+
+        // 🚀 خدعة تجميلية: إذا كان المفتاح عبارة عن رقم (ID السؤال)، نكتب "تفصيل رقم X"
+        if (int.tryParse(question) != null) {
+          question = "تفصيل رقم $question";
+        }
+
+        qnaWidgets.add(_buildQnARow(question, answer));
+      });
+    }
+
+    if (qnaWidgets.isEmpty) {
+      return const Text("لا توجد تفاصيل قابلة للقراءة", style: TextStyle(fontFamily: 'Tajawal', color: AppColors.textSecondary));
+    }
+
+    return Column(
+      children: qnaWidgets,
+    );
+  }
+
+  // 🚀 كرت السؤال والجواب المصغر (Q&A Card)
+  Widget _buildQnARow(String question, String answer) {
     return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(18)),
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primaryGradientStart.withOpacity(0.05), width: 1),
+      ),
       child: Column(
-        children: answers.entries.map((e) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: [
-                const Icon(Icons.circle, size: 6, color: AppColors.accent),
-                const SizedBox(width: 10),
-                Expanded(child: Text("${e.value}", style: const TextStyle(fontSize: 13, color: AppColors.textSecondary))),
-              ],
-            ),
-          );
-        }).toList(),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // نص السؤال (باهت قليلاً)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.help_outline_rounded, size: 14, color: AppColors.textSecondary),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                    question,
+                    style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontFamily: 'Tajawal', fontWeight: FontWeight.w600)
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // نص الجواب (بارز وواضح)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.subdirectory_arrow_left_rounded, size: 16, color: AppColors.primaryGradientStart),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                    answer,
+                    style: const TextStyle(fontSize: 14, color: AppColors.textPrimary, fontFamily: 'Tajawal', fontWeight: FontWeight.bold)
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
+  // 🚀 ويدجت لعرض إجابات العميل في الـ BottomSheet
 
   Widget _buildSubmitButton(controller, id, min, max, msg) {
     return Obx(() => Container(

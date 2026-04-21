@@ -3,6 +3,7 @@ import 'package:untitled1/view/provider_setup_screen.dart';
 import '../AppBindings/initial_binding.dart';
 import '../view/auth/ForgotPasswordScreen.dart';
 import '../view/auth/ResetPasswordScreen.dart';
+import '../view/main_screen.dart';
 import '../view/provider_requests_screen.dart';
 import '../view/splash_screen.dart';
 import '../view/auth/login_screen.dart';
@@ -34,12 +35,15 @@ class AppRoutes {
     GetPage(name: resetPassword, page: () => const ResetPasswordScreen()),
     GetPage(
       name: home,
-      page: () => const HomeScreen(),
-      //binding: HomeBinding(),
+     // page: () => const HomeScreen(),
+  page: () => const MainScreen(),
+      binding: HomeBinding(),
       transition: Transition.fadeIn, // إضافة تأثير ظهور ناعم للرئيسية
     ),
     GetPage(name: providerSetup, page: () => const ProviderSetupScreen()),
-    GetPage(name: ProviderRequests, page: () => const ProviderRequestsScreen()),
+    GetPage(name: ProviderRequests,
+        //page: () => const ProviderRequestsScreen()
+        page: () => const MainScreen()),
 
 
   ];

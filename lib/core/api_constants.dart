@@ -7,4 +7,5 @@ class ApiConstants {
   static const String getMainCategories = "$baseUrl/categoriey/main";
   static const String getCategoryQuestions = "$baseUrl/categories_questions/";
   static const String refresh = "$baseUrl/auth/user/refresh";
+  static const String userOffers = "$baseUrl/user/offers";
 }

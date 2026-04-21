@@ -9,6 +9,7 @@ import '../controller/provider_setup_controller.dart';
 import '../controller/sub_category_controller.dart';
 import '../core/theme/app_colors.dart';
 import '../controller/home_controller.dart';
+import 'main_screen.dart';
 
 class ProviderSetupScreen extends StatelessWidget {
   const ProviderSetupScreen({super.key});
