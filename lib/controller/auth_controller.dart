@@ -10,7 +10,6 @@ import '../core/api_constants.dart';
 import '../routes/app_routes.dart';
 import 'package:http/http.dart' as http;
 
-import '../view/main_screen.dart';
 import '../view/map_picker_screen.dart';
 import 'home_controller.dart';
 

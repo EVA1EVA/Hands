@@ -145,7 +145,7 @@ class HomeController extends GetxController {
 
     // نرسل طلب للباك إند لنعرف معلومات المستخدم
     var response = await box.get(
-      Uri.parse('${ApiConstants.baseUrl}/user/profile'),
+      Uri.parse('${ApiConstants.baseUrl}/profile'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -155,6 +155,41 @@ class HomeController extends GetxController {
       isProviderVerified.value = data['provider_verified_at'] != null;
     }
   }
+ /* Future<void> getVerificationStatus() async {
+    try {
+      String? token = GetStorage().read('token');
+
+      final String url = '${ApiConstants.baseUrl}/profile';
+
+      print("📡 Checking Verification at: $url");
+
+      var response = await box.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        var decodedData = jsonDecode(response.body);
+
+        var userData = decodedData['data'] ?? decodedData;
+
+        // التأكد من حالة التوثيق
+        // في لارفل الحقل هو provider_verified_at
+        isProviderVerified.value = userData['provider_verified_at'] != null;
+
+        print("✅ Verification Status: ${isProviderVerified.value}");
+      } else {
+        print("⚠️ Server Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("❌ Exception caught: $e");
+    }
+  }*/
+
+
   @override
   void onClose() {
     scrollController.dispose();
